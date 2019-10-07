@@ -9,8 +9,8 @@ if len(sys.argv) == 4:
     file = open(sys.argv[3], 'r').read()
 # else get it from stdin
 else:
-    path = input()
-    file = open(path, 'r').read()
+    file = sys.stdin.readlines()
+    file = ''.join(file)
 # check if flag is sentence-level
 if flag == '-s':
     # if a whitespace is preceded by .,!, ? or newline, it splits the file on the space.
