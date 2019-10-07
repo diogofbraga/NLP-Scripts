@@ -25,15 +25,16 @@ def pattern_paragraph(file):
             # remove \n's if there are any in the middle of the paragraphs
             print(p.replace('\n', ' '))
 
+
 # get arguments through command line
 flag = sys.argv[1]
 pattern = sys.argv[2]
-# if there are 4 args (script name included), read the file given as argument
+# if there are 3 args get it from stdin
 if len(sys.argv) == 3:
     file = sys.stdin.readlines()
     file = ''.join(file)
-# else get it from stdin
-else:
+# if there are more than 3 args, read the files given as arguments
+elif len(sys.argv) > 3:
     files = []
     for i in range(3, len(sys.argv)):
         files.append(sys.argv[i])
