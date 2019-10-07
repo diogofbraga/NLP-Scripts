@@ -1,0 +1,10 @@
+Implement a sentence or paragraph level grep.
+
+This tool, nlgrep, should take as argument a word or a regular
+expression and filter sentences (flag -s) or paragraphs (flag -p) from
+files passed as argument or from STDIN.
+
+Examples:
+
+    nlgrep -s input.txt > sentence_output.txt
+    nlgrep -p input.txt > paragraph_output.txt
