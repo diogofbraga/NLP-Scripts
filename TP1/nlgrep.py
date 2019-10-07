@@ -1,31 +1,32 @@
 import re
+import sys
 
 # get arguments through command line
-
-
-def nlgrep(flag, file):
-    # get regex from stdin
-    pattern = input("Search for words or regular expression:\n")
-    if flag == '-s':
-        # if a whitespace is preceded by .,! or ?, it splits the file on the space.
-        sentences = re.split(r"(?<=[.?!])\s(?=[A-Z\n])", file)
-        # debug print: see the sentences gotten after splitting
-        print(sentences)
-        # for each sentence, search the pattern. If there are any positive results, the sentence is printed to the ouput.
-        for s in sentences:
-            res = re.search(pattern, s)
-            if res is not None:
-                print(s)
-    elif flag == '-p':
-        # paragraph: \n or \n\n ?
-        paragraphs = re.split(r"\n", file)
-        # debug print: see the paragraphs gotter after splitting
-        print(paragraphs)
-        # for each paragraph, search the pattern. If there are any positive results, the paragraph is printed to the ouput.
-        for p in paragraphs:
-            res = re.search(pattern, p)
-            if res is not None:
-                print(p)
-
-
-nlgrep("-s", "Harry lay flat on his back, breathing hard as though he had been running. He had awoken from a vivid dream with his hands pressed over his face. The old scar on his forehead, which was shaped like a bolt of lightning, was burning beneath his fingers as though someone had just pressed a white-hot wire to his skin. He sat up, one hand still on his scar, the other hand reaching out in the darkness for his glasses, which were on the bedside table. He put them on and his bedroom came into clearer focus, lit by a faint, misty orange light that was filtering through the curtains from the street lamp outside the window.")
+flag = sys.argv[1]
+pattern = sys.argv[2]
+# if there are 4 args (script name included), read the file given as argument
+if len(sys.argv) == 4:
+    file = open(sys.argv[3], 'r').read()
+# else get it from stdin
+else:
+    path = input()
+    file = open(path, 'r').read()
+# check if flag is sentence-level
+if flag == '-s':
+    # if a whitespace is preceded by .,!, ? or newline, it splits the file on the space.
+    sentences = re.split(r"(?<=[.?!\n])\s(?=[A-Z])", file)
+    # for each sentence, search the pattern. If there are any positive results, the sentence is printed to the ouput.
+    for s in sentences:
+        res = re.search(pattern, s)
+        if res is not None:
+            # remove \n's if there are any in the middle of the sentences
+            print(s.replace('\n', ' '))
+# check if flag is paragraph-level
+elif flag == '-p':
+    paragraphs = re.split(r"\n\n", file)
+    # for each paragraph, search the pattern. If there are any positive results, the paragraph is printed to the ouput.
+    for p in paragraphs:
+        res = re.search(pattern, p)
+        if res is not None:
+            # remove \n's if there are any in the middle of the paragraphs
+            print(p.replace('\n', ' '))
