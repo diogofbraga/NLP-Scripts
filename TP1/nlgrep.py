@@ -17,6 +17,7 @@ def nlgrep(flag, file, pattern):
     if flag == '-s':
         # if a whitespace is preceded by .,!, ? or newline, it splits the file on the space.
         sentences = re.split(r"(?<=[.?!])\s|\n(?=[A-Z])", file)
+        if len(sys.argv) == 3: print("------- Output: -------")
         # for each sentence, search the pattern. If there are any positive results, the sentence is printed to the ouput.
         for s in sentences:
             if (string_found(pattern, s)) is True:
@@ -25,6 +26,7 @@ def nlgrep(flag, file, pattern):
     # check if flag is paragraph-level
     elif flag == '-p':
         paragraphs = re.split(r"\n\n", file)
+        if len(sys.argv) == 3: print("------- Output: -------")
         # for each paragraph, search the pattern. If there are any positive results, the paragraph is printed to the ouput.
         for p in paragraphs:
             if (string_found(pattern, p)) is True:
@@ -45,4 +47,5 @@ if len(sys.argv) == 3:
 elif len(sys.argv) > 3:
     for i in range(3, len(sys.argv)):
         file = open(sys.argv[i], 'r').read()
+        print("------- " + sys.argv[i] + " -------")
         nlgrep(flag, file, pattern)
