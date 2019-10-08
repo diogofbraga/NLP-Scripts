@@ -42,9 +42,11 @@ pattern = sys.argv[2]
 if len(sys.argv) == 3:
     file = sys.stdin.readlines()
     file = ''.join(file)
+    print("------- Output: -------")
     nlgrep(flag, file, pattern)
 # if there are more than 3 args, read the files given as arguments
 elif len(sys.argv) > 3:
     for i in range(3, len(sys.argv)):
         file = open(sys.argv[i], 'r').read()
+        print("------- " + sys.argv[i] + " -------")
         nlgrep(flag, file, pattern)
