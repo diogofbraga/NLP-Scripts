@@ -16,7 +16,7 @@ def nlgrep(flag, file, pattern):
     # check if flag is sentence-level
     if flag == '-s':
         # if a whitespace is preceded by .,!, ? or newline, it splits the file on the space.
-        sentences = re.split(r"(?<=[.?!\n])\s(?=[A-Z])", file)
+        sentences = re.split(r"(?<=[.?!])\s|\n(?=[A-Z])", file)
         # for each sentence, search the pattern. If there are any positive results, the sentence is printed to the ouput.
         for s in sentences:
             if (string_found(pattern, s)) is True:
