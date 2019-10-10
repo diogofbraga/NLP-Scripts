@@ -18,7 +18,6 @@ def nlgrep(flag, file, pattern):
         # if a whitespace is preceded by ., ! or ?, it splits the file on the space.
         sentences = re.split(
             r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<![A-Z][a-z][a-z]\.)(?<=[.?!])[\s\n]+", file)
-        # print(sentences)
         # for each sentence, search the pattern. If there are any positive results, the sentence is printed to the ouput.
         for s in sentences:
             if (string_found(pattern, s)) is True:
@@ -52,6 +51,7 @@ elif len(sys.argv) > 3:
         nlgrep(flag, file, pattern)
 
 
+# For testing:
 # python3 nlgrep.py -p "Harry" input.txt > paragraph_output.txt
 # python3 nlgrep.py -s "Harry" input.txt > sentence_output.txt
 # python3 nlgrep.py -p "Minerva" the_odissey_homer.txt > paragraph_odissey.txt
