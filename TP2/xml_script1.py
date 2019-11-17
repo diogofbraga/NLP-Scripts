@@ -5,29 +5,23 @@ from bs4 import BeautifulSoup
 import re
 import unicodedata
 
-path = "test.xml"
-
+path = "test1.xml"
 infile = open(path,"r")
-
 contents = infile.read()
-
 soup = BeautifulSoup(contents,'xml')
-
 pages = soup.findAll('page')
 
 pattern = "Proverbios"
-
-c1 = re.compile(r"\* \&quot;.\&quot;")
+proverbios = []
 
 for page in pages:
-
     title = page.find('title')
-
     title = unicodedata.normalize('NFKD', title.get_text()).encode('ASCII', 'ignore')
-
-    proverbios = []
 
     if (re.search(pattern, title)):
         #print(title.get_text())
         text = page.find('text')
-        print(text.get_text())
+        #print(text.get_text())
+        proverbios = re.findall(r"Com céu azul carregado",text.get_text())
+
+print(proverbios)
