@@ -6,33 +6,46 @@ import matplotlib.pyplot as plt
 from nltk.tokenize import RegexpTokenizer
 import nltk
 
+def parseHTML(url):
+    text_url = url
+    text_content = requests.get(text_url).text
+    # Criar objeto BS, usando o lxml
+    text_soup = BeautifulSoup(text_content, 'lxml')
+    return  text_soup.get_text()
+
+def getStopwords(num):
+    # remover stopwords : escolher uma das opcoes consoante a flag
+    if num == '100':
+        stopwords_url = 'https://www.linguateca.pt/chave/stopwords/publico.MF100.txt'
+    elif num == '200':
+        stopwords_url = 'https://www.linguateca.pt/chave/stopwords/publico.MF200.txt'
+    else:
+        stopwords_url = 'https://www.linguateca.pt/chave/stopwords/publico.MF300.txt'
+
+    stopwords_content = requests.get(stopwords_url).text
+    stopwords_soup = BeautifulSoup(stopwords_content,'lxml')
+    return stopwords_soup.get_text()
+
+def lower(flag,list):
+    # lower se tiver flag de ignore case
+    if flag:
+        return [w.lower() for w in list]
+    else:
+        return list
+
 def parse_words_without_NLTK():
     start = time.time()
     print('STARTED PARSING WITHOUT NLTK')
     # dom casmurro de machado de assis
     # passar url como argumento ?
-    text_url= 'https://www.gutenberg.org/files/55752/55752-h/55752-h.htm'
-    text_content = requests.get(text_url).text
-    # Criar objeto BS, usando o lxml
-    text_soup = BeautifulSoup(text_content, 'lxml')
-
-    text = text_soup.get_text()
+    text = parseHTML('https://www.gutenberg.org/files/55752/55752-h/55752-h.htm')
 
     words = re.findall(r"\w+",text,re.UNICODE)
     
-    # lower se tiver flag de ignore case
-    lower_words = [w.lower() for w in words]
-    print('words: ',len(lower_words))
+    # check flag
+    lower_words = lower(True, words)
 
-    # remover stopwords : escolher uma das opcoes consoante a flag
-    # lista de stopwords:
-    # 100 palavras: https://www.linguateca.pt/chave/stopwords/publico.MF100.txt
-    # 200 palavras: https://www.linguateca.pt/chave/stopwords/publico.MF200.txt
-    # 300 palavras: https://www.linguateca.pt/chave/stopwords/publico.MF300.txt
-    stopwords_url = 'https://www.linguateca.pt/chave/stopwords/publico.MF300.txt'
-    stopwords_content = requests.get(stopwords_url).text
-    stopwords_soup = BeautifulSoup(stopwords_content,'lxml')
-    stopwords_text = stopwords_soup.get_text()
+    stopwords_text = getStopwords('300')
 
     stopwords = re.findall(r'\w+',stopwords_text,re.UNICODE)
     print('stopwords: ',len(stopwords))
@@ -59,31 +72,30 @@ def parse_words_without_NLTK():
     print('Drawing graph...')
     plt.bar(range(10),values[:10],tick_label=names[:10])
     plt.xticks(rotation=25,fontsize=7.5)
+
+    end = time.time()
+    print('Elapsed time: ',end - start, 'seconds')
+
     plt.plot()
     # close plot
     plt.clf()
 
-    end = time.time()
-    print('Elapsed time: ',end - start, 'seconds')
 
 def parse_words_with_NLTK():
     start = time.time()
     print('STARTED PARSING WITH NLTK')
     # dom casmurro de machado de assis
     # passar url como argumento ??
-    text_url= 'https://www.gutenberg.org/files/55752/55752-h/55752-h.htm'
-    text_content = requests.get(text_url).text
-    # Criar objeto BS, usando o lxml
-    text_soup = BeautifulSoup(text_content, 'lxml')
-
-    text = text_soup.get_text()
+    text = parseHTML('https://www.gutenberg.org/files/55752/55752-h/55752-h.htm')
 
     tokenizer = RegexpTokenizer('\w+')
     tokens = tokenizer.tokenize(text)
 
     # lower se tiver flag de ignore case
-    words = [token.lower() for token in tokens]
+    # check flag
+    words = lower(True, tokens)
     print('words: ',len(words))
+    
     # usar stopwords se tiver flag
     stopwords = nltk.corpus.stopwords.words('portuguese')
     print('stopwords: ',len(stopwords))
