@@ -5,6 +5,9 @@ import time
 import matplotlib.pyplot as plt
 from nltk.tokenize import RegexpTokenizer
 import nltk
+import sys
+from getopt import getopt
+from urllib.parse import urlparse
 
 
 def parseHTML(url):
@@ -17,9 +20,9 @@ def parseHTML(url):
 
 def getStopwords(num):
     # remover stopwords : escolher uma das opcoes consoante a flag
-    if num == '100':
+    if num == 100:
         stopwords_url = 'https://www.linguateca.pt/chave/stopwords/publico.MF100.txt'
-    elif num == '200':
+    elif num == 200:
         stopwords_url = 'https://www.linguateca.pt/chave/stopwords/publico.MF200.txt'
     else:
         stopwords_url = 'https://www.linguateca.pt/chave/stopwords/publico.MF300.txt'
@@ -37,21 +40,27 @@ def lower(flag, list):
         return list
 
 
-def parse_words_without_NLTK():
+def parseWordsNoNLTK(html):
     start = time.time()
     print('STARTED PARSING WITHOUT NLTK')
     # dom casmurro de machado de assis
-    # passar url como argumento ?
-    text = parseHTML(
-        'https://www.gutenberg.org/files/55752/55752-h/55752-h.htm')
+
+    text = parseHTML(html)
 
     words = re.findall(r"\w+", text, re.UNICODE)
     print('words: ', len(words))
 
+    return words,start
+
+def lowerNoNLTK(words):
     # check flag
     lower_words = lower(True, words)
 
-    stopwords_text = getStopwords('300')
+    return lower_words
+
+def stopWordsNoNLTK(lower_words,start,num,p):
+
+    stopwords_text = getStopwords(num)
 
     stopwords = re.findall(r'\w+', stopwords_text, re.UNICODE)
     print('stopwords: ', len(stopwords))
@@ -76,7 +85,7 @@ def parse_words_without_NLTK():
 
     # default 10 : escolher numero consoante a flag
     print('Drawing graph...')
-    plt.bar(range(10), values[:10], tick_label=names[:10])
+    plt.bar(range(p), values[:p], tick_label=names[:p])
     plt.xticks(rotation=25, fontsize=7.5)
 
     end = time.time()
@@ -87,22 +96,29 @@ def parse_words_without_NLTK():
     plt.clf()
 
 
-def parse_words_with_NLTK():
+
+
+def parseWordsNLTK(html):
     start = time.time()
     print('STARTED PARSING WITH NLTK')
     # dom casmurro de machado de assis
-    # passar url como argumento ??
-    text = parseHTML(
-        'https://www.gutenberg.org/files/55752/55752-h/55752-h.htm')
+
+    text = parseHTML(html)
 
     tokenizer = RegexpTokenizer('\w+')
     tokens = tokenizer.tokenize(text)
 
+    return tokens,start
+
+def lowerNLTK(tokens):
     # lower se tiver flag de ignore case
     # check flag
     words = lower(True, tokens)
     print('words: ', len(words))
 
+    return words
+
+def getStopwordsNLTK(words,start):
     # usar stopwords se tiver flag
     stopwords = nltk.corpus.stopwords.words('portuguese')
     print('stopwords: ', len(stopwords))
@@ -114,12 +130,47 @@ def parse_words_with_NLTK():
     end = time.time()
     print('Elapsed time: ', end - start, 'seconds')
 
+    return freqdist
+
+def plot_NLTK(freqdist,num):
     # em vez de 10, pôr X consoante a flag
-    freqdist.plot(10)
+    freqdist.plot(num)
     # close plot
     plt.clf()
 
 
-# correr uma delas consoante a flag
-#parse_words_without_NLTK()
-parse_words_with_NLTK()
+def main():
+    opts, args = getopt(sys.argv[1:], "mnlsu:N:p:")
+    dop = dict(opts)
+
+    #html = 'https://www.gutenberg.org/files/55752/55752-h/55752-h.htm';
+
+    if "-u" in dop:
+        html = dop.get('-u')
+
+    if "-m" in dop:
+        words,start = parseWordsNoNLTK(html)
+        if "-l" in dop:
+            words = lowerNoNLTK(words)
+        if "-N" in dop:
+            numSW = int(dop.get('-N',100))
+        else: numSW = 100
+        if "-p" in dop:
+            numP = int(dop.get("-p"))
+        else: numP = 10
+        stopWordsNoNLTK(words,start,numSW,numP)
+
+    if "-n" in dop:
+        words,start = parseWordsNLTK(html)
+        if "-l" in dop:
+            words = lowerNLTK(words)
+        if "-s" in dop:
+            freqdist = getStopwordsNLTK(words,start)
+        else:
+            freqdist = nltk.FreqDist(words)
+        if "-p" in dop:
+            numP = int(dop.get('-p'))
+        else: numP = 10
+        plot_NLTK(freqdist,numP)
+
+main()
