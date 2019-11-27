@@ -153,7 +153,7 @@ def main():
         if "-l" in dop:
             words = lowerNoNLTK(words)
         if "-N" in dop:
-            numSW = int(dop.get('-N',100))
+            numSW = int(dop.get('-N'))
         else: numSW = 100
         if "-p" in dop:
             numP = int(dop.get("-p"))
