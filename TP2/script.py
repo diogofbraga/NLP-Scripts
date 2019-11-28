@@ -19,7 +19,7 @@ def parseHTML(url):
 
 
 def getStopwords(num):
-    # remover stopwords : escolher uma das opcoes consoante a flag
+
     if num == 100:
         stopwords_url = 'https://www.linguateca.pt/chave/stopwords/publico.MF100.txt'
     elif num == 200:
@@ -33,7 +33,7 @@ def getStopwords(num):
 
 
 def lower(flag, list):
-    # lower se tiver flag de ignore case
+
     if flag:
         return [w.lower() for w in list]
     else:
@@ -43,7 +43,6 @@ def lower(flag, list):
 def parseWordsNoNLTK(html):
     start = time.time()
     print('STARTED PARSING WITHOUT NLTK')
-    # dom casmurro de machado de assis
 
     text = parseHTML(html)
 
@@ -53,12 +52,12 @@ def parseWordsNoNLTK(html):
     return words,start
 
 def lowerNoNLTK(words):
-    # check flag
+
     lower_words = lower(True, words)
 
     return lower_words
 
-def stopWordsNoNLTK(lower_words,start,num,p):
+def stopWordsNoNLTK(lower_words,num):
 
     stopwords_text = getStopwords(num)
 
@@ -67,6 +66,10 @@ def stopWordsNoNLTK(lower_words,start,num,p):
 
     clean_words = [w for w in lower_words if w not in stopwords]
     print('clean words: ', len(clean_words))
+
+    return clean_words
+
+def plotNoNLTK(clean_words,start,p):
 
     print('counting word frequency...')
     word_count = [clean_words.count(w) for w in clean_words]
@@ -83,7 +86,7 @@ def stopWordsNoNLTK(lower_words,start,num,p):
     names = [val[1] for val in sorted_list]
     values = [val[0] for val in sorted_list]
 
-    # default 10 : escolher numero consoante a flag
+    # default 10
     print('Drawing graph...')
     plt.bar(range(p), values[:p], tick_label=names[:p])
     plt.xticks(rotation=25, fontsize=7.5)
@@ -101,7 +104,6 @@ def stopWordsNoNLTK(lower_words,start,num,p):
 def parseWordsNLTK(html):
     start = time.time()
     print('STARTED PARSING WITH NLTK')
-    # dom casmurro de machado de assis
 
     text = parseHTML(html)
 
@@ -111,15 +113,14 @@ def parseWordsNLTK(html):
     return tokens,start
 
 def lowerNLTK(tokens):
-    # lower se tiver flag de ignore case
     # check flag
     words = lower(True, tokens)
     print('words: ', len(words))
 
     return words
 
-def getStopwordsNLTK(words,start):
-    # usar stopwords se tiver flag
+def getStopwordsNLTK(words):
+
     stopwords = nltk.corpus.stopwords.words('portuguese')
     print('stopwords: ', len(stopwords))
     clean_words = [word for word in words if word not in stopwords]
@@ -127,13 +128,12 @@ def getStopwordsNLTK(words,start):
 
     freqdist = nltk.FreqDist(clean_words)
 
+    return freqdist
+
+def plotNLTK(freqdist,num,start):
     end = time.time()
     print('Elapsed time: ', end - start, 'seconds')
 
-    return freqdist
-
-def plot_NLTK(freqdist,num):
-    # em vez de 10, pôr X consoante a flag
     freqdist.plot(num)
     # close plot
     plt.clf()
@@ -155,22 +155,24 @@ def main():
         if "-N" in dop:
             numSW = int(dop.get('-N'))
         else: numSW = 100
+        if "-s" in dop:
+            words = stopWordsNoNLTK(words,numSW)
         if "-p" in dop:
             numP = int(dop.get("-p"))
         else: numP = 10
-        stopWordsNoNLTK(words,start,numSW,numP)
+        plotNoNLTK(words,start,numP)
 
-    if "-n" in dop:
+    elif "-n" in dop:
         words,start = parseWordsNLTK(html)
         if "-l" in dop:
             words = lowerNLTK(words)
         if "-s" in dop:
-            freqdist = getStopwordsNLTK(words,start)
+            freqdist = getStopwordsNLTK(words)
         else:
             freqdist = nltk.FreqDist(words)
         if "-p" in dop:
             numP = int(dop.get('-p'))
         else: numP = 10
-        plot_NLTK(freqdist,numP)
+        plotNLTK(freqdist,numP,start)
 
 main()
