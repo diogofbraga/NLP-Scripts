@@ -19,7 +19,6 @@ def parseHTML(url):
     # Obter apenas o texto da pagina HTML, sem as tags deste
     return text_soup.get_text()
 
-
 def getStopwords(num):
     if num == 100:
         stopwords_url = 'https://www.linguateca.pt/chave/stopwords/publico.MF100.txt'
@@ -35,7 +34,6 @@ def getStopwords(num):
     # Obter a lista de stopwords, extraindo-as da div
     return stopwords_soup.get_text()
 
-
 def lower(flag, list):
     # se a flag de lower estiver ativada,
     # transformar todas as letras das palavras em minusculas
@@ -45,6 +43,11 @@ def lower(flag, list):
     else:
         return list
 
+def lower_res(tokens):
+    words = lower(True, tokens)
+    print('words: ', len(words))
+
+    return words
 
 def parseWordsNoNLTK(html):
     # iniciar contador de tempo
@@ -53,17 +56,12 @@ def parseWordsNoNLTK(html):
 
     text = parseHTML(html)
 
-    # obter todas as palavras presentes no texto 
+    # obter todas as palavras presentes no texto
     # obtido do parseHTML, com a Regex \w+, no formato UNICODE
     words = re.findall(r"\w+", text, re.UNICODE)
     print('words: ', len(words))
 
     return words,start
-
-def lowerNoNLTK(words):
-    lower_words = lower(True, words)
-
-    return lower_words
 
 def stopWordsNoNLTK(lower_words,num):
     stopwords_text = getStopwords(num)
@@ -114,8 +112,6 @@ def plotNoNLTK(clean_words,start,p):
     plt.clf()
 
 
-
-
 def parseWordsNLTK(html):
     # inicialização do temporizador
     start = time.time()
@@ -129,12 +125,6 @@ def parseWordsNLTK(html):
     tokens = tokenizer.tokenize(text)
 
     return tokens,start
-
-def lowerNLTK(tokens):
-    words = lower(True, tokens)
-    print('words: ', len(words))
-
-    return words
 
 def getStopwordsNLTK(words):
     # obter as stopwords da corpora do nltk
@@ -178,7 +168,7 @@ def main():
         words,start = parseWordsNoNLTK(html)
         # flag lower / ignore case
         if "-l" in dop:
-            words = lowerNoNLTK(words)
+            words = lower_res(words)
         # numero de stopwords a utilizar (100, 200 ou 300)
         if "-N" in dop:
             numSW = int(dop.get('-N'))
@@ -199,7 +189,7 @@ def main():
         words,start = parseWordsNLTK(html)
         # flag lower / ignore case
         if "-l" in dop:
-            words = lowerNLTK(words)
+            words = lower_res(words)
         # flag de stopwords
         if "-s" in dop:
             freqdist = getStopwordsNLTK(words)
